@@ -10,6 +10,7 @@ import re
 from pdf2image import convert_from_path
 from inference import run_inference_and_save_images
 from api_call import get_bounding_boxes, draw_bounding_boxes, format_object_counts, count_objects
+from dataset_utils import save_crop_and_labels
 import json
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -258,14 +259,17 @@ def upload_file():
 
             # Find "Reflected Ceiling" and "Architectural Floor Plan" pages and convert them to images
             image_paths = find_and_convert_pages_to_images(file_path)
-            output_image_paths = run_inference_and_save_images(image_paths)
+            output_image_info = run_inference_and_save_images(image_paths)
             object_counts = {}
 
             annotated_image_paths = {}
-            for keyword, output_image_path in output_image_paths.items():
+            for label, info in output_image_info.items():
+                output_image_path = info['filename']
+                crop_bbox = info['bbox']
+                source_image = info['source']
                 full_image_path = os.path.join(app.config['IMAGES_FOLDER'], output_image_path)
                 bounding_boxes = get_bounding_boxes(full_image_path)
-
+                
                 if bounding_boxes:
                     # Update the object count
                     counts = count_objects(bounding_boxes)
@@ -277,7 +281,14 @@ def upload_file():
 
                     # Draw bounding boxes on the images
                     annotated_image_path = draw_bounding_boxes(full_image_path, bounding_boxes)
-                    annotated_image_paths[f"{keyword} Annotated"] = os.path.basename(annotated_image_path)
+                    annotated_image_paths[f"{label} Annotated"] = os.path.basename(annotated_image_path)
+                    if crop_bbox is not None:
+                        save_crop_and_labels(
+                            os.path.join(app.config['IMAGES_FOLDER'], source_image),
+                            crop_bbox,
+                            full_image_path,
+                            bounding_boxes,
+                        )
                 else:
                     print(f"Failed to get bounding boxes for {output_image_path}")
 
