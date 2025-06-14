@@ -26,7 +26,7 @@ IMAGES_FOLDER = 'images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['EXTRACTED_FOLDER'] = EXTRACTED_FOLDER
 app.config['IMAGES_FOLDER'] = IMAGES_FOLDER
-app.config['OPENAI_API_KEY'] = os.getenv("OPENAI_API_KEY")
+app.config['OPENAI_API_KEY'] = 'os.getenv("OPENAI_API_KEY")'
 # Create necessary folders if they don't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(EXTRACTED_FOLDER, exist_ok=True)
