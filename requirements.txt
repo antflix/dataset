@@ -1,0 +1,10 @@
+Flask
+inference
+markdown2
+openai
+pdf2image
+Pillow
+Pillow
+PyPDF2
+Requests
+Werkzeug
