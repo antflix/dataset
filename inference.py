@@ -4,6 +4,13 @@ from PIL import Image
 import io
 import os
 from dataset_utils import save_full_image
+import re
+
+
+def _sanitize(label: str) -> str:
+    """Convert label to a filesystem-safe string."""
+    return re.sub(r"[^A-Za-z0-9_-]+", "_", label).strip("_")
+
 
 def run_inference_and_save_images(image_paths):
     from app import app
@@ -14,6 +21,7 @@ def run_inference_and_save_images(image_paths):
     
     output_info = {}
     for keyword, image_path in image_paths.items():
+        safe_keyword = _sanitize(keyword)
         # Construct the full path and check if the image file exists
         full_image_path = os.path.join(app.config['IMAGES_FOLDER'], image_path)
         if not os.path.isfile(full_image_path):
@@ -44,7 +52,8 @@ def run_inference_and_save_images(image_paths):
                         try:
                             image_data = base64.b64decode(crop_info)
                             image = Image.open(io.BytesIO(image_data))
-                            output_filename = f"{keyword}_output_crop_{idx}.jpg"
+                            output_filename = f"{safe_keyword}_output_crop_{idx}.jpg"
+
                             output_path = os.path.join(app.config['IMAGES_FOLDER'], output_filename)
                             image.save(output_path)
                             crop_bbox = None
