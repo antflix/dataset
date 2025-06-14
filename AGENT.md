@@ -1,6 +1,6 @@
 install deps with "pip install -r requirements.txt"
 must have OPENAI_API_KEY and ROBOFLOW_API_KEY set as enviornmental variables
-
+You can use the cbizhallway.pdf file to test the code
 Here is an example of what is returned from the api call in api_call.py:
 ```
 json
